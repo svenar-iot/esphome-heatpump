@@ -28,6 +28,7 @@ ESPHome-powered controller for Midea heat pumps (including clones) that integrat
 
 ## R32
 Commonly tested models are listed below, but this is not an exhaustive list.
+[Airwell](https://www.airwell.com/en/), [Artel](https://www.artelgroup.com/products-heat-pumps/), [Ferroli](https://www.ferroli.com/int/products/hydronic-heat-pumps-cooling-heating-dhw), [Kaisai](https://www.kaisaisystems.nl), [Inventor](https://www.inventorairconditioner.com/heat-pumps-split-monoblock/split-type-heat-pumps/matrix-split-type), [Kaysun](https://www.kaysun.es/en/products-kaysun/aquantia/), [YORK](https://www.pompycieplayork.pl/produkty/).
 
 __Using:__ `models/midea-R32-generic.yaml`
 - [Midea R32] MHA-VxxW/D2N8

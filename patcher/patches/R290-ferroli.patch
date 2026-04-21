@@ -1,0 +1,109 @@
+--- R290-ferroli.yaml	2026-04-21 17:16:05.134297107 +0200
++++ R290-ferroli_patched.yaml	2026-04-21 17:29:10.947808996 +0200
+@@ -60,6 +60,7 @@
+   name: "${devicename}"
+   comment: "${description}"
+   friendly_name: "${description}"
++  name_add_mac_suffix: true
+   project:
+     name: "${devicename}.${description}"
+     version: 9.1.0
+@@ -69,6 +70,10 @@
+   framework:
+     type: esp-idf
+ 
++dashboard_import:
++  package_import_url: github://svenar-iot/esphome-heatpump/models/midea-R290-ferroli.yaml
++  import_full_config: false
++
+ # Enable logging
+ logger:
+   level: INFO
+@@ -92,6 +97,14 @@
+ 
+ captive_portal:
+ 
++output:
++  - platform: gpio
++    id: orange_led_out
++    pin: GPIO18
++  - platform: gpio
++    id: green_led_out
++    pin: GPIO19
++
+ uart:
+   id: mod_bus
+   tx_pin: 17
+@@ -386,6 +399,10 @@
+     name: Uptime
+     id: "${devicename}_uptime"
+     icon: mdi:timelapse
++  - platform: wifi_signal
++    name: "WiFi Signal Strength"
++    id: "${devicename}_wifi_signal_strength"
++    icon: mdi:wifi
+   - platform: template
+     name: "Coefficient of Performance"
+     id: "${devicename}_coefficient_of_performance"
+@@ -1801,6 +1818,14 @@
+       id(unmasked_value_register_278) = x;
+       return x;
+ binary_sensor:
++  - platform: gpio
++    pin: GPIO22
++    id: factory_reset_button
++    name: "Factory Reset Button"
++    on_press:
++      then:
++        - switch.turn_on: ${devicename}_restart_with_factory_default_settings
++
+   - platform: template
+     name: "Compressor Running"
+     id: compressor_running
+@@ -5051,6 +5076,10 @@
+     id: "${devicename}_esphome_version"
+     icon: mdi:information
+     hide_timestamp: true
++  - platform: wifi_info
++    mac_address:
++      name: ESP Mac Wifi Address
++      id: wifi_mac_address
+   - platform: template
+     name: "Active State"
+     id: "${devicename}_active_state"
+@@ -5514,6 +5543,35 @@
+       }
+       return x;
+ interval:
++  - interval: 1s
++    then:
++      if:
++        condition:
++          wifi.connected:
++        then:
++          - output.turn_off: green_led_out
++        else:
++          - output.turn_on: green_led_out
++          - delay: 500ms
++          - output.turn_off: green_led_out
++  - interval: 500ms
++    then:
++      if:
++        condition:
++          api.connected:
++        then:
++          - output.turn_off: orange_led_out
++        else:
++          - if:
++              condition:
++                wifi.connected
++              then:
++                - output.turn_on: orange_led_out
++                - delay: 250ms
++                - output.turn_off: orange_led_out
++              else:
++                - output.turn_off: orange_led_out
++
+   - interval: 1h
+     then:
+       - lambda: |-

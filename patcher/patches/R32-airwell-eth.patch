@@ -1,0 +1,122 @@
+--- patcher/workdir/models/R32-airwell.yaml	2026-05-27 23:31:08.069402246 +0200
++++ models/midea-R32-airwell-eth.yaml	2026-05-27 23:30:06.654164997 +0200
+@@ -55,11 +55,16 @@
+     type: int
+     restore_value: no
+     initial_value: '0'
++  - id: eth_connected
++    type: bool
++    restore_value: no
++    initial_value: 'false'
+ 
+ esphome:
+   name: "${devicename}"
+   comment: "${description}"
+   friendly_name: "${description}"
++  name_add_mac_suffix: true
+   project:
+     name: "${devicename}.${description}"
+     version: 9.1.0
+@@ -69,6 +74,10 @@
+   framework:
+     type: esp-idf
+ 
++dashboard_import:
++  package_import_url: github://svenar-iot/esphome-heatpump/models/midea-R32-airwell-eth.yaml
++  import_full_config: false
++
+ # Enable logging
+ logger:
+   level: INFO
+@@ -84,13 +93,33 @@
+ ota:
+   platform: esphome
+ 
+-wifi:
+-  power_save_mode: none
+-  ap:
+-    ssid: "${devicename}-setup"
+-    password: "heatpump"
+-
+-captive_portal:
++ethernet:
++  type: LAN8720
++  mdc_pin: GPIO23
++  mdio_pin: GPIO18
++  clk:
++    pin: GPIO0
++    mode: CLK_EXT_IN
++  phy_addr: 1
++
++  on_connect:
++    - globals.set:
++        id: eth_connected
++        value: 'true'
++    - output.turn_off: green_led_out
++
++  on_disconnect:
++    - globals.set:
++        id: eth_connected
++        value: 'false'
++
++output:
++  - platform: gpio
++    id: orange_led_out
++    pin: GPIO14
++  - platform: gpio
++    id: green_led_out
++    pin: GPIO15
+ 
+ uart:
+   id: mod_bus
+@@ -1071,6 +1100,14 @@
+       }
+ 
+ binary_sensor:
++  - platform: gpio
++    pin: GPIO34
++    id: factory_reset_button
++    name: "Factory Reset Button"
++    on_press:
++      then:
++        - switch.turn_on: ${devicename}_restart_with_factory_default_settings
++
+   - platform: template
+     name: "Compressor Running"
+     id: compressor_running
+@@ -4332,6 +4369,35 @@
+       return {z};
+ 
+ interval:
++  - interval: 1s
++    then:
++      if:
++        condition:
++          lambda: 'return !id(eth_connected);'
++        then:
++          - output.turn_off: green_led_out
++        else:
++          - output.turn_on: green_led_out
++          - delay: 500ms
++          - output.turn_off: green_led_out
++  - interval: 500ms
++    then:
++      if:
++        condition:
++          api.connected:
++        then:
++          - output.turn_off: orange_led_out
++        else:
++          - if:
++              condition:
++                lambda: 'return !id(eth_connected);'
++              then:
++                - output.turn_on: orange_led_out
++                - delay: 250ms
++                - output.turn_off: orange_led_out
++              else:
++                - output.turn_off: orange_led_out
++
+   - interval: 1h
+     then:
+       - lambda: |-

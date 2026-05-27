@@ -77,6 +77,19 @@ def execute_task_item(item):
         else:
             print(f"Invalid rename arguments: {args_str}")
     
+    elif cmd_type == 'copy':
+        parts = args_str.split(' ')
+        if len(parts) >= 2:
+            src = parts[0]
+            dst = parts[1]
+            print(f"Copying {src} to {dst}")
+            dst_dir = os.path.dirname(dst)
+            if dst_dir and not os.path.exists(dst_dir):
+                os.makedirs(dst_dir, exist_ok=True)
+            shutil.copy(src, dst)
+        else:
+            print(f"Invalid copy arguments: {args_str}")
+    
     else:
         print(f"Unknown command type: {cmd_type}")
 

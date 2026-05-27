@@ -8,18 +8,30 @@ prepare:
   - "[rmdir] workdir"
   - "[mkdir] workdir"
   - "[clone] https://github.com/Mosibi/Midea-heat-pump-ESPHome.git workdir"
+  - "[copy] workdir/models/R32-generic.yaml workdir/models/eth-R32-generic.yaml"
+  - "[copy] workdir/models/R32-airwell.yaml workdir/models/eth-R32-airwell.yaml"
+  - "[copy] workdir/models/R290-generic.yaml workdir/models/eth-R290-generic.yaml"
+  - "[copy] workdir/models/R290-ferroli.yaml workdir/models/eth-R290-ferroli.yaml"
 
 patch:
   - "[patch] workdir/models/R32-generic.yaml patches/R32-generic.patch"
   - "[patch] workdir/models/R32-airwell.yaml patches/R32-airwell.patch"
   - "[patch] workdir/models/R290-generic.yaml patches/R290-generic.patch"
   - "[patch] workdir/models/R290-ferroli.yaml patches/R290-ferroli.patch"
+  - "[patch] workdir/models/eth-R32-generic.yaml patches/R32-generic-eth.patch"
+  - "[patch] workdir/models/eth-R32-airwell.yaml patches/R32-airwell-eth.patch"
+  - "[patch] workdir/models/eth-R290-generic.yaml patches/R290-generic-eth.patch"
+  - "[patch] workdir/models/eth-R290-ferroli.yaml patches/R290-ferroli-eth.patch"
 
 move:
   - "[rename] workdir/models/R32-generic.yaml ../models/midea-R32-generic.yaml"
   - "[rename] workdir/models/R32-airwell.yaml ../models/midea-R32-airwell.yaml"
   - "[rename] workdir/models/R290-generic.yaml ../models/midea-R290-generic.yaml"
   - "[rename] workdir/models/R290-ferroli.yaml ../models/midea-R290-ferroli.yaml"
+  - "[rename] workdir/models/eth-R32-generic.yaml ../models/midea-R32-generic-eth.yaml"
+  - "[rename] workdir/models/eth-R32-airwell.yaml ../models/midea-R32-airwell-eth.yaml"
+  - "[rename] workdir/models/eth-R290-generic.yaml ../models/midea-R290-generic-eth.yaml"
+  - "[rename] workdir/models/eth-R290-ferroli.yaml ../models/midea-R290-ferroli-eth.yaml"
 
 cleanup:
   - "[rmdir] workdir"
